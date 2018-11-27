@@ -6,8 +6,8 @@ Add tiny_wav/include to your build system.  If you use cmake, you can add this a
 
 ## Usage
 ```C
-    // Load file data
-    std::ifstream stream(filePath, std::ios::binary);
+	// Load file data
+	std::ifstream stream(filePath, std::ios::binary);
 	if (!stream.good() || stream.eof())
 	{
 		fprintf(stderr, "Failed to open wav file %s\n", filePath);
@@ -24,7 +24,7 @@ Add tiny_wav/include to your build system.  If you use cmake, you can add this a
 		m_FileData.push_back(c);
 	});
 
-    // Load wav data from file
+	// Load wav data from file
 	int channels;
 	int samplerate;
 	int bps;
