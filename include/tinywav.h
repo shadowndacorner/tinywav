@@ -82,14 +82,19 @@ void tw_free(void* ptr)
 #endif // __cplusplus
 #endif // !defined(TINY_WAV_ALLOC_OVERRIDE)
 
-static int cmp_chunk_id(const char* lhs, const char* rhs)
+static int cmp_chunk_id_l(const char* lhs, const char* rhs, int len)
 {
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < len; ++i)
 	{
 		if (lhs[i] != rhs[i])
 			return 1;
 	}
 	return 0;
+}
+
+static int cmp_chunk_id(const char* lhs, const char* rhs)
+{
+	return cmp_chunk_id_l(lhs, rhs, 4);
 }
 
 static char tw_error_str[256] = {0};
@@ -180,6 +185,24 @@ char* tw_load_mem(const char* mem, size_t size, int* channels, int* samplerate, 
 	// Read data chunk (sans data)
 	memcpy(&data, mem + offset, sizeof(WavDataChunk));
 	offset += sizeof(WavDataChunk);
+
+	// If we have any junk chunks, ignore them
+	while (cmp_chunk_id(data.subchunk_id, "junk") == 0)
+	{
+		// TODO: Figure out junk chunk
+		offset += data.size;
+		memcpy(&data, mem + offset, sizeof(WavDataChunk));
+		offset += sizeof(WavDataChunk);
+	}
+
+	// Ignore any pad chunks
+	while (cmp_chunk_id_l(data.subchunk_id, "pad", 3) == 0)
+	{
+		// TODO: Figure out junk chunk
+		offset += data.size;
+		memcpy(&data, mem + offset, sizeof(WavDataChunk));
+		offset += sizeof(WavDataChunk);
+	}
 
 	if (cmp_chunk_id(data.subchunk_id, "data") != 0)
 	{
