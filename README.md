@@ -4,6 +4,13 @@ A small, header-only C library to load wav files.
 ## Building
 Add tiny_wav/include to your build system.  If you use cmake, you can add this as a subdirectory and link against tinywav, which will add the include directory automatically.  If you are going this route, be sure to `set(TW_WITH_SAMPLE off)`.
 
+Once the header is in your build system, be sure to add
+```C
+#define TINY_WAV_IMPLEMENTATION
+#include <tinywav.h>
+```
+to a single source file.
+
 ## Usage
 ```C
 	// Load file data
