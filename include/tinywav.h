@@ -17,7 +17,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 void* tw_malloc(size_t);
 void tw_free(void*);
 
@@ -26,9 +26,14 @@ const char* tw_get_error();
 const int tw_has_error();
 #ifdef __cplusplus
 }
-#endif
+#endif// __cplusplus
 
 #if defined(TINY_WAV_IMPLEMENTATION)
+
+#if defined(_MSC_VER) || defined(_MSVC_LANG)	// if this is msvc
+#pragma warning(disable:4996)					// disable the _CRT_SECURE_NO_WARNINGS warning so we can use sprintf
+#endif	// #if is msvc
+
 #if !defined(TINY_WAV_ALLOC_OVERRIDE)
 #include <stdlib.h>
 #include <string.h>
@@ -60,16 +65,22 @@ typedef struct
 	uint32_t size;
 } WavDataChunk;
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 void* tw_malloc(size_t size)
 {
-    return malloc(size);
+	return malloc(size);
 }
 
 void tw_free(void* ptr)
 {
-    free(ptr);
+	free(ptr);
 }
-#endif
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // !defined(TINY_WAV_ALLOC_OVERRIDE)
 
 static int cmp_chunk_id(const char* lhs, const char* rhs)
 {
@@ -102,8 +113,12 @@ enum _WAV_FORMATS
 	WAV_FORMAT_COUNT
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif	// __cplusplus
 const char* tw_get_error()
 {
+	
 	return tw_error_str;
 }
 
@@ -172,6 +187,12 @@ char* tw_load_mem(const char* mem, size_t size, int* channels, int* samplerate, 
 		return NULL;
 	}
 
+	if (offset + data.size > size)
+	{
+		sprintf(tw_error_str, "Attempted to read out of memory bounds");
+		return NULL;
+	}
+
 	char* data_ptr = (char*)tw_malloc(data.size);
 	memcpy(data_ptr, mem + offset, data.size);
 
@@ -197,5 +218,8 @@ char* tw_load_mem(const char* mem, size_t size, int* channels, int* samplerate, 
 
 	return data_ptr;
 }
-#endif
-#endif
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
+#endif	// TINY_WAV_IMPLEMENTATION
+#endif	// __TINYWAV_H

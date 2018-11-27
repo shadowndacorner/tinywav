@@ -11,6 +11,11 @@ Once the header is in your build system, be sure to add
 ```
 to a single source file.
 
+## Explanation
+All you need to do to use this library is call `tw_load_mem` on a wav file loaded into memory.  It returns a `char*` with the unprocessed wav data loaded in.  You can optionally pass in int pointers to get additional data out of the file, such as sample rate, channels, etc.  Once you are done with the data, you should call tw_free.
+
+You can optionally provide your own memory management functions by defining `TINY_WAV_ALLOC_OVERRIDE` and implementing the functions `void* tw_malloc(size_t)` and `void tw_free(void*)`.  By default, these just wrap malloc and free.  Note that if you are using C++, these functions expect C linkage, so wrap them in `extern "C"`.
+
 ## Usage Example (C++)
 ```C++
 // Load file data
@@ -42,6 +47,8 @@ if (!data)
 	fprintf(stderr, "TinyWav Error: %s\n", tw_get_error());
 	return -1;
 }
+// do things with the data
+tw_free(data);
 ```
 
 ## Limitations
