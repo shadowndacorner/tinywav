@@ -160,7 +160,8 @@ char* tw_load_mem(const char* mem, size_t size, int* channels, int* samplerate, 
 
 	// Read format chunk
 	memcpy(&format, mem + offset, sizeof(WavFormatChunk));
-	offset += sizeof(WavFormatChunk);
+	offset += sizeof(WavDataChunk);
+	offset += format.size;
 
 	if (cmp_chunk_id(format.subchunk_id, "fmt\x20") != 0)
 	{
